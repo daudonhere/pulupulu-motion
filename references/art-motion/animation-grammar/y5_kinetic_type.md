@@ -130,7 +130,7 @@ Four grounds across the whole film + ink + white, and only ever one accent color
 
 ## Demo film
 
-- Finished film: `scripts/art-motion/engine/demos/y5_kinetic_type/` (render with `render.py --film demos/y5_kinetic_type`) (8.5s, 60fps, synthesized score at 120 BPM); one frame per shot overview: `assets/animation-grammar/y5_kinetic_type_overview.jpg`
+- Finished film: `scripts/art-motion/engine/demos/y5_kinetic_type/` (8.5s, 60fps, synthesized score at 120 BPM). It ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/y5_kinetic_type`. The upstream overview still is not shipped.
 - Project: `scripts/art-motion/engine/demos/y5_kinetic_type/` (`eras.js`, `kinetic.js`, `k1_title.js / k2_complete.js / k3_chat.js / k4_agent.js`); the shared parts are in `scripts/art-motion/engine/lib/`
 - Shot list: K1 title "The 3 stages of AI writing code" → zoom through → K2 "completion" (code card + gray completion + Tab) → band wipe → K3 "conversation" (you one line, it a whole paragraph) → push → K4 "agent" (three TODOs check themselves off) + progress track full
 

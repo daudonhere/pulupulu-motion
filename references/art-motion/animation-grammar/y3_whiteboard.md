@@ -2,7 +2,7 @@
 
 In one sentence: the speaker says one sentence and a hand writes that sentence and draws a diagram on a large whiteboard; the camera follows the argument across the board, and at the end it pulls back so the audience sees the whole argument as one drawing.
 
-Demo film: `scripts/art-motion/engine/demos/y3_whiteboard/` (render with `render.py --film demos/y3_whiteboard`) (8s, 3 shots, 2 transition types + closing pull-back), overview: `assets/animation-grammar/y3_whiteboard_overview.jpg`
+Demo film: `scripts/art-motion/engine/demos/y3_whiteboard/` (8s, 3 shots, 2 transition types + closing pull-back). It ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/y3_whiteboard`. The upstream overview still is not shipped.
 Basis: research into the style (the original research text and per-frame data stay in the experiment archive and were not taken into the skill; the numbers used are excerpted into this card). Measured RSA Animate's "Changing Education Paradigms" and Minute Physics's "Why is it Dark at Night?", and also checked VideoScribe's and Doodly's official documentation and first-hand accounts from Andrew Park and Henry Reich.
 
 **Choose one grammar first; do not mix them:**

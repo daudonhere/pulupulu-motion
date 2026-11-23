@@ -2,7 +2,7 @@
 
 One sentence: draw an abstract concept as one concrete object, put it inside a glowing world that can scale without limit, and let the camera travel between scales; the environment layer (stars, particles) may keep drifting gently the whole time, the subject and the information change on narration beats, and once they settle, they stop.
 
-Demo film: `scripts/art-motion/engine/demos/y1_kurzgesagt/` (render with `render.py --film demos/y1_kurzgesagt`) (8s, 3 shots, 2 transitions), overview: `assets/animation-grammar/y1_kurzgesagt_overview.jpg`
+Demo film: `scripts/art-motion/engine/demos/y1_kurzgesagt/` (8s, 3 shots, 2 transitions). It ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/y1_kurzgesagt`. The upstream overview still is not shipped.
 Basis: research into this style (the original research text and per-frame data stay in the experiment archive and were not collected into the skill; the numbers used are excerpted into this card) (two 2025 main films plus a measured pass on the 2014 "The Immune System", official Skillshare class transcript). Numbers tagged [measured] and [first-hand] come from there; those tagged [this film] are the parameters actually used in the demo film.
 
 ## Check before you start

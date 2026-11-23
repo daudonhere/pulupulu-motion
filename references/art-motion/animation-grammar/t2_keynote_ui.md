@@ -2,7 +2,7 @@
 
 > One-sentence grammar: **one thing per screen, the product itself (screenshot, screen recording, physical object) as the hero, nouns and numbers settling when the narration reaches them; type tightened, springs with no bounce or light bounce.** Glow-blob gradient grounds, frosted-glass cards, gradient type, centred blur-in and decorative float are all optional packaging — use sparingly (see "Check before you start").
 >
-> Demo film: `scripts/art-motion/engine/demos/t2_keynote_ui/` (render with `render.py --film demos/t2_keynote_ui`) (8s, 3 shots) · overview `assets/animation-grammar/t2_keynote_ui_overview.jpg` · code `scripts/art-motion/engine/demos/t2_keynote_ui/`
+> Demo film: `scripts/art-motion/engine/demos/t2_keynote_ui/` (8s, 3 shots). The demo code ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/t2_keynote_ui`. The upstream overview still is not shipped.
 
 ## Check before you start
 

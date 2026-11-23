@@ -23,6 +23,13 @@ passes a gate that another fails.
 | acting | per-beat frame strips + region-change measure (`scripts/stickman_qa.py`) | not applicable |
 | balloons | no balloon over any head, none over another balloon, inside the safe rect (`references/chat-balloons.md`) | only if balloons are used |
 | duration | within 0.5 s of the brief | same |
+| maths (advisory) | `python scripts/math_gate.py spec.json` prints no warning | same, for t1 clip specs |
+
+The maths check is deliberately not blocking. It reads a t1 spec and reports a symbol that changes
+colour, more than four semantic colours, a conclusion with less than 0.6 s left after its cue, and
+month names or spelled-out numbers in on-screen text. The 0.6 s hold is a reading note from the
+3b1b grammar, not a delivery hold: a film may end on a title without a pause. Decide against the
+frames, then answer or fix the warning.
 
 Performance path is the tighter freeze window because an acting beat that holds a full second is dead
 performance; a graphics film legitimately holds a composed shot, provided the hold is declared.

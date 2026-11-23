@@ -2,7 +2,7 @@
 
 > One-sentence grammar: **build the coordinate system first, then let the data "grow" out, and finally label only one thing; one colour tells the story and the rest go grey; the numbers are always honest (bars start at 0, units and source written on the chart), and the animation only decides "how it appears", never "what the value is".**
 >
-> Demo film: `scripts/art-motion/engine/demos/t3_finance_chart/` (render with `render.py --film demos/t3_finance_chart`) (8s, 3 shots, all data fictional, an "illustrative data" badge bottom right on every shot) · overview `assets/animation-grammar/t3_finance_chart_overview.jpg` · code `scripts/art-motion/engine/demos/t3_finance_chart/`
+> Demo film: `scripts/art-motion/engine/demos/t3_finance_chart/` (8s, 3 shots, all data fictional, an "illustrative data" badge bottom right on every shot). The demo code ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/t3_finance_chart`. The upstream overview still is not shipped.
 
 ## Check before you start
 

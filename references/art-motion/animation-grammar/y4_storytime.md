@@ -137,7 +137,7 @@ Entrances/exits: storytime has almost no "entrance animation" — on the first f
 
 ## Demo film
 
-- Finished film: `scripts/art-motion/engine/demos/y4_storytime/` (render with `render.py --film demos/y4_storytime`) (8.75s, 60fps, with temporary voiceover + SFX); one frame per shot overview: `assets/animation-grammar/y4_storytime_overview.jpg`
+- Finished film: `scripts/art-motion/engine/demos/y4_storytime/` (8.75s, 60fps, with temporary voiceover + SFX). It ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/y4_storytime`. The upstream overview still is not shipped.
 - Project: `scripts/art-motion/engine/demos/y4_storytime/` (`eras.js` segment table, `story.js`, `world.js` world canvas, `s1_desk.js / s2_screen.js / s3_react.js / s4_wide.js / s5_close.js`); the shared parts are in `scripts/art-motion/engine/lib/`
 - Shot list: S1 medium, talking to camera (0–2.0s) → whip → S2 over the shoulder at the screen, code waterfall + "3000 lines" (2.0–4.4s) → smash → S3 reaction big close-up, silence (4.4–5.6s) → hard cut → S4 extreme wide of the same room, "I ask it: these…", glance at the computer, point at it (5.6–7.25s) → jump-in → S5 near shot, palms up, "where do they go?" + "?", hold (7.25–8.75s)
 

@@ -1,0 +1,64 @@
+{
+  "grammar": "t1_3b1b",
+  "duration": 7.4,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "theme": "ink",
+  "_note": "Plot primitives for the t1 grammar. Grid and axes set one domain, vectors point inside it, the brace labels the matrix, and the last cue holds the Indicate tint. Every token colour is a concept name, not decoration.",
+  "cues": [
+    {
+      "at": 0.0,
+      "kind": "grid",
+      "data": { "x": [-2, 2], "y": [-2, 2], "step": 1, "color": "GREY_D" }
+    },
+    {
+      "at": 0.3,
+      "kind": "axes",
+      "data": { "xLabel": "x", "yLabel": "y", "color": "GREY_B" }
+    },
+    {
+      "at": 1.2,
+      "kind": "vector",
+      "data": { "from": [0, 0], "to": [2, 1], "color": "BLUE_C", "label": "w" }
+    },
+    {
+      "at": 2.6,
+      "kind": "matrix",
+      "data": {
+        "rows": [
+          [1, 0],
+          [0, 1]
+        ],
+        "color": "BLUE_C",
+        "label": "W",
+        "size": 52
+      }
+    },
+    {
+      "at": 4.0,
+      "kind": "vector",
+      "data": {
+        "from": [0, 0],
+        "to": [-1, 1.5],
+        "color": "RED_C",
+        "label": "v"
+      }
+    },
+    {
+      "at": 5.2,
+      "kind": "brace",
+      "data": {
+        "target": "matrix",
+        "index": 0,
+        "label": "weights",
+        "color": "YELLOW"
+      }
+    },
+    {
+      "at": 6.2,
+      "kind": "highlight",
+      "data": { "target": "vector", "index": 0 }
+    }
+  ]
+}

@@ -542,6 +542,8 @@ references/ui-motion/          timing/easing tables, emotion mapping, choreograp
 references/narration/          tts-intonation skill + tts-prosody.py
 references/generated-assets.md how to commission and validate image assets
 scripts/doctor.py              read-only preflight
+scripts/math_gate.py            advisory maths check for t1 clip specs
+scripts/manim_bridge.py         beats/timeline to a t1 clip spec skeleton
 scripts/deliver_check.py       mux with explicit mapping, then validate the file
 scripts/deepseek_voice.py      DeepSeek speech toolkit: speak, cost, lay, beats, asr, gate
 scripts/lang-audit.py          fails the build when the wrong language survives

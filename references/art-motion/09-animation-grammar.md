@@ -19,7 +19,7 @@ All 8 grammars ship a directly renderable demo film (`scripts/art-motion/engine/
 | **t2 Keynote UI** | Product/feature launches, version updates, tutorial steps, spec announcements | One thing per screen; a product screenshot or the real object is the lead and gets pushed into, and nouns and numbers land when the narration says them; the glow-field ground and glass cards are optional packaging, use them sparingly | Talk screen 5–8s; product fast cuts 1.5–3s | `MO.spring` bounce 0–0.15, `MO.appleOut` | Blur push `blurPush`, card expand `expandRect` | `animation-grammar/t2_keynote_ui.md` | `--film demos/t2_keynote_ui` |
 | **t3 Finance chart** | Revenue, share price, market share, turning points; numbers the audience will screenshot and check | Build the axes first, then let the data grow, then annotate exactly one thing; the values are always honest, the animation only decides how they appear | One chart 2.5–6s | `MO.quintOut`; for lines `MO.smooth` | Panel truck `slidePush`, push into a region `zoomThrough` (live + bScale0), hard cut with the layout held still | `animation-grammar/t3_finance_chart.md` | `--film demos/t3_finance_chart` |
 
-Overview stills: `assets/animation-grammar/<grammar>_overview.jpg` (one frame per shot).
+Overview stills from upstream are not shipped. Demo films come from the pinned art-motion bundle (release `v1.0`), described in `references/art-extension.md`.
 
 Demo commands (run under `scripts/`):
 

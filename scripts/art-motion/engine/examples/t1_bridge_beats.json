@@ -1,0 +1,24 @@
+{
+  "_note": "Sample beat list for scripts/manim_bridge.py. Caption text is the screen form, so numbers are digits. Run the bridge, then assign equation token colours by hand.",
+  "beats": [
+    {
+      "id": "b1",
+      "caption": "Matrix W acts on a vector",
+      "start": 0.0,
+      "seconds": 1.4
+    },
+    { "id": "b2", "caption": "W·v = (2, 1)", "start": 1.8, "seconds": 1.2 },
+    {
+      "id": "b3",
+      "caption": "The columns show where the basis lands",
+      "start": 3.4,
+      "seconds": 1.2
+    },
+    {
+      "id": "b4",
+      "caption": "So the image is (2, 1)",
+      "start": 5.0,
+      "seconds": 1.2
+    }
+  ]
+}

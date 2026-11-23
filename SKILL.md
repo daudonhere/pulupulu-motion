@@ -140,6 +140,11 @@ but never report it as passed when it was not.
 | file | `python scripts/deliver_check.py out/film.mp4 --timeline timeline.json` (or `--video/--audio/--out` to mux first) | frame size, frame rate, audio present and long enough, true peak, delivery size | re-mux or re-encode |
 | pops | `pulupulu qa out/film.mp4` | `no single-frame pops` | find the one-frame element |
 
+`scripts/math_gate.py spec.json` is an advisory maths check for t1 clip specs: symbol colour,
+semantic palette, the hold after a conclusion, and digit notation. It prints warnings and exits 0.
+Answer a warning against the finished frames, or fix the spec; do not report it as a passed gate.
+The cue fields it reads are listed in `references/art-motion/animation-grammar/t1_3b1b.md`.
+
 `pulupulu qa` also reports motion per second, `still for ≥ 1 s` and `flat opening`. Those are judgements
 about pacing, measured on a 96×54 greyscale comparison, so a low-contrast slow move can read as still. Use
 them as a reason to look, not as a verdict to obey.

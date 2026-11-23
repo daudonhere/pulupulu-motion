@@ -2,7 +2,7 @@
 
 In one sentence: put the argument on a desk that holds real material — clippings, photographs, documents — and move the camera across that desk like an investigative reporter's eye; lines and pen strokes are drawn on in stops and starts, and the sense of evidence comes from "these things really were placed here".
 
-Demo film: `scripts/art-motion/engine/demos/y2_vox/` (render with `render.py --film demos/y2_vox`) (8s, 3 shots, 2 transitions), overview: `assets/animation-grammar/y2_vox_overview.jpg`
+Demo film: `scripts/art-motion/engine/demos/y2_vox/` (8s, 3 shots, 2 transitions). It ships in the pinned art-motion bundle (release `v1.0`), not in this repository. Install it with `python scripts/install_art_motion.py`, then render with `python scripts/art-motion/engine/render.py --film demos/y2_vox`. The upstream overview still is not shipped.
 Basis: research into this style (the original research text and the per-frame data stay in the experiment archive and were not taken into the skill; the numbers used are excerpted into this card). Five sample films: Missing Chapter (2022), the psychedelic-poster film (2019), Vox Borders (2018), Johnny Harris (2026), plus a Vox 2026 live-action film as a control. 13 camera moves were fitted for easing, and colours were sampled.
 
 ## Check before you start

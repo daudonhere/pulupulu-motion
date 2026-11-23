@@ -1,12 +1,17 @@
-// Clip · 3b1b / manim-style explainer (t1): pure black ground, only ever one thing on screen at a time — the one being talked about; text and equations are both Write (stroke first, then fill), and every ease is smooth.
-// The signature move is Transform: the previous concept becomes the next one directly — no cut, no fade out and start over.
+// Clip · 3b1b / manim-style explainer (t1): pure black ground, one thing on screen at a time, the thing being explained. Text and equations are both Write (stroke first, then fill), and every ease is smooth.
+// The signature move is Transform: the previous concept becomes the next one directly. No cut, no fade out and start over.
 // cues: title (starts its Write on this frame; when another title arrives the old one FadeOuts and slides up; if too long, shrink the type first, then wrap to two lines)
 //       equation (data.tokens = a DG.math token array, or just pass text; colour = concept name: col takes a manim colour name such as 'BLUE_C' or a #hex)
-//                 every equation after the first is not Written again — it Transforms in from the previous one (TransformMatchingTex: same-named symbols move to their new position, unmatched ones fade out/in; 1.5s by default)
+//                 every equation after the first is not Written again. It Transforms in from the previous one (TransformMatchingTex: same-named symbols move to their new position, unmatched ones fade out/in; 1.5s by default)
 //       point (one bullet per line, Write; when a new bullet arrives the old ones turn grey)
 //       line (Create the axes first, then draw the curve: data.values = [y...] (evenly spaced) or data.points = [[x,y]...]; text = curve label; data.color)
 //            every line after the first is a Transform: the previous curve morphs into this one point by point (resampled by arc length), colour and label change with it, the axes stay put
-//       highlight (Indicate + a yellow box that stays: data.index = which bullet (counts points only, 0-based; defaults to the newest); data.target = 'equation' boxes the equation)
+//       grid (coordinate grid behind the plot: data.x / data.y = [min, max], data.step, data.color. It is context, so it is drawn once and then left alone)
+//       axes (standalone x/y axes with ticks: data.color, data.xLabel, data.yLabel. A line cue still draws its own axes unless an axes cue is present)
+//       vector (arrow in plot coordinates: data.from = [x,y], data.to = [x,y], data.color, data.label. The head lands on the cue's own frame)
+//       matrix (entries with brackets: data.rows = [[...], [...]], data.color, data.size, data.label. Each entry accepts a token object or a plain value)
+//       brace (vertical brace beside a target: data.target = 'equation'|'matrix'|'rect', data.index, data.rect = [x,y,w,h] in 0..1 canvas units, data.label)
+//       highlight also accepts data.target = 'vector'|'line' with data.index, which Indicate-tints that plot object instead of a bullet
 // Layout: with a line, landscape puts text left / plot right, portrait puts plot on top / text below; the bullet block is vertically centred in the remaining height. safe: content is laid out only between top..H−bottom.
 // An over-wide equation shrinks as a whole (every equation shares one size so the Transform doesn't jump), and long equations stay inside the frame in portrait.
 // Glyphs: CMU italic draws θ as ϑ, so θ switches to EB Garamond italic (a closed θ); runs of two or more letters (softmax, ReLU) are set as upright words, only single letters are italic variables.
@@ -61,7 +66,7 @@ return {
     M = ctx.pal ? palMap(ctx.pal) : DG.MANIM; INK = ctx.pal ? ctx.pal.ink : '#fff'; DG.FONT.zh = 'PuHui-Medium';                         // any CJK: PuHui (the Source Han Serif subset only carries the glyphs the demo film uses)
     const { W, H, u, safe } = ctx, g = document.createElement('canvas').getContext('2d');
     const pad = (ctx.portrait ? 70 : 140) * u, yTop = safe.top, yBot = H - safe.bottom - (ctx.portrait ? 90 : 70) * u;
-    const hasLine = ctx.of('line').length > 0, hasEq = ctx.of('equation').length > 0;
+    const hasLine = ctx.of('line', 'vector', 'grid', 'axes').length > 0, hasEq = ctx.of('equation').length > 0;
     // title
     const titles = ctx.of('title').map(q => ({ q, ...titleLines(g, q.text || '', W - 2 * pad, (ctx.portrait ? 72 : 62) * u, ctx.portrait ? 3 : 2) }));
     const tH = titles.length ? Math.max(...titles.map(z => z.lines.length * z.size * 1.25)) : 0;
@@ -90,17 +95,23 @@ return {
     if (blockH > text.y1 - text.y0 + 1) console.warn(`t1: ${points.length} bullets still don't fit at 0.6× type (overflowing by ${Math.round(blockH - (text.y1 - text.y0))}px): when a new bullet arrives the whole block scrolls up and the earliest fades out — to keep them all on screen delete a few or split into two segments`);
     let py = text.y0 + Math.max(0, (text.y1 - text.y0 - blockH) / 2) * (hasLine && !ctx.portrait ? 1 : 0.6);   // bullet block vertically centred (slightly high in portrait)
     for (const p of points) { p.y = py + size; py += p.h + gapP; p.need = Math.max(0, py - gapP - text.y1); }   // need: how far the block must scroll up when this bullet arrives so it doesn't cross y1
-    // curve: coordinates use the data range across all lines (so the axes don't move during a Transform)
+    // plot objects share one data domain, so a grid, a vector and a curve agree on where [0,0] is
     const lines = ctx.of('line').map(q => { const d = q.data || {}; return { q, d, pts0: d.points || (d.values || []).map((v, i) => [i, v]) }; }).filter(l => l.pts0.length >= 2);
-    if (plot && lines.length) {
-      const all = lines.flatMap(l => l.pts0), xs = all.map(p => p[0]), ys = all.map(p => p[1]);
-      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(0, ...ys); let y1 = Math.max(...ys); if (y1 === y0) y1 = y0 + 1;
+    const vecs = ctx.of('vector').map(q => { const d = q.data || {}; return { q, d, from: d.from || [0, 0], to: d.to || [1, 1] }; }).filter(v => v.from.length === 2 && v.to.length === 2);
+    const grids = ctx.of('grid').map(q => q.data || {}), axes = ctx.of('axes'), mats = ctx.of('matrix'), braces = ctx.of('brace');
+    if (plot) {
+      const all = [...lines.flatMap(l => l.pts0), ...vecs.flatMap(v => [v.from, v.to])];
+      const xs = all.map(p => p[0]).concat(...grids.map(d => Array.isArray(d.x) && d.x.length === 2 ? d.x : []));
+      const ys = all.map(p => p[1]).concat(...grids.map(d => Array.isArray(d.y) && d.y.length === 2 ? d.y : []), 0);
+      if (!xs.length) xs.push(-1, 1);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys); let y1 = Math.max(...ys); if (y1 === y0) y1 = y0 + 1;
+      plot.x0 = x0; plot.x1 = x1; plot.y0 = y0; plot.y1 = y1;
       plot.X = v => plot.x + (v - x0) / ((x1 - x0) || 1) * plot.w; plot.Y = v => plot.y + plot.h - (v - y0) / (y1 - y0) * plot.h * 0.9;
       for (const l of lines) { const [lx0, lx1] = [Math.min(...l.pts0.map(p => p[0])), Math.max(...l.pts0.map(p => p[0]))];
         // each curve stretches across the full plot width (different lines may measure x in different units: loss-parameter → loss-step)
         l.scr = l.pts0.map(([px, py]) => [plot.x + (px - lx0) / ((lx1 - lx0) || 1) * plot.w, plot.Y(py)]); l.rs = resample(l.scr, 160); }
     }
-    L = { titleY, titles, eqY, eqSz, text, plot, points, size, lines };
+    L = { titleY, titles, eqY, eqSz, text, plot, points, size, lines, vecs, grids, axes, mats, braces, matBoxes: [] };
   },
   draw(c0, t, ctx) {
     const { W, H, u } = ctx;
@@ -135,14 +146,34 @@ return {
     }
     // ---- axes + curve: the first is Created, each later one morphs point by point from the previous ----
     const P = L.plot;
-    if (P && L.lines.length) {
+    if ((P && (L.lines.length || L.grids.length || L.axes.length || L.vecs.length)) || L.mats.length || L.braces.length) {
+      L.grids.forEach(q => {
+        const d = q.data || {}, step = d.step || 1, gp = MO.smooth(ctx.p(t, q.at, q.dur || 0.8)); if (gp <= 0) return;
+        const gx = Array.isArray(d.x) && d.x.length === 2 ? d.x : [P.x0, P.x1], gy = Array.isArray(d.y) && d.y.length === 2 ? d.y : [P.y0, P.y1];
+        c.save(); c.beginPath(); c.rect(P.x, P.y, P.w, P.h); c.clip(); c.globalAlpha *= gp * 0.55; c.strokeStyle = col(d.color) || M.GREY_D; c.lineWidth = 1.5 * u;
+        for (let v = Math.ceil(gx[0] / step) * step; v <= gx[1] + 1e-9; v += step) { const xx = P.X(v); c.beginPath(); c.moveTo(xx, P.y); c.lineTo(xx, P.y + P.h); c.stroke(); }
+        for (let v = Math.ceil(gy[0] / step) * step; v <= gy[1] + 1e-9; v += step) { const yy = P.Y(v); c.beginPath(); c.moveTo(P.x, yy); c.lineTo(P.x + P.w, yy); c.stroke(); }
+        c.restore();
+      });
+      L.axes.forEach(q => {
+        const d = q.data || {}, ap = MO.smooth(ctx.p(t, q.at, q.dur || 0.6)); if (ap <= 0) return;
+        const yZero = clamp(P.Y(0), P.y, P.y + P.h);
+        c.save(); c.strokeStyle = col(d.color) || M.GREY_B; c.lineWidth = 3 * u; c.lineCap = 'round';
+        c.beginPath(); c.moveTo(P.x, yZero); c.lineTo(P.x + P.w * ap, yZero); c.moveTo(P.x, P.y + P.h); c.lineTo(P.x, P.y + P.h - P.h * ap); c.stroke();
+        c.globalAlpha *= ap; for (let kk = 1; kk <= 4; kk++) { const xx = P.x + P.w * kk / 4; c.beginPath(); c.moveTo(xx, yZero - 8 * u); c.lineTo(xx, yZero + 8 * u); c.stroke(); }
+        c.restore();
+        if (d.xLabel) { c.save(); c.globalAlpha *= ap; c.font = `${30 * u}px "${DG.FONT.it}"`; c.fillStyle = col(d.color) || M.GREY_B; c.textAlign = 'right'; c.fillText(d.xLabel, P.x + P.w, yZero + 34 * u); c.restore(); }
+        if (d.yLabel) { c.save(); c.globalAlpha *= ap; c.font = `${30 * u}px "${DG.FONT.it}"`; c.fillStyle = col(d.color) || M.GREY_B; c.textAlign = 'left'; c.fillText(d.yLabel, P.x + 10 * u, P.y + 34 * u); c.restore(); }
+      });
       const l0 = L.lines[0];
-      if (ctx.lt(t, l0.q.at) > 0) {
+      if (l0 && ctx.lt(t, l0.q.at) > 0) {
+        if (!L.axes.length) {
         const ap = MO.smooth(ctx.p(t, l0.q.at, 0.6)), lw = 3 * u;
         c.save(); c.strokeStyle = M.GREY_B; c.lineWidth = lw; c.lineCap = 'round';
         c.beginPath(); c.moveTo(P.x, P.Y(0)); c.lineTo(P.x + P.w * ap, P.Y(0)); c.moveTo(P.x, P.y + P.h); c.lineTo(P.x, P.y + P.h - P.h * ap); c.stroke();
         c.globalAlpha = ap; for (let kk = 1; kk <= 4; kk++) { const xx = P.x + P.w * kk / 4; c.beginPath(); c.moveTo(xx, P.Y(0) - 8 * u); c.lineTo(xx, P.Y(0) + 8 * u); c.stroke(); }
         c.restore();
+        }
         let j = 0; L.lines.forEach((l, i) => { if (ctx.lt(t, l.q.at) > 0) j = i; });
         const l = L.lines[j], lc = col(l.d.color) || M.BLUE_C;
         c.save(); c.lineWidth = 5 * u; c.lineJoin = 'round'; c.lineCap = 'round';
@@ -158,6 +189,57 @@ return {
         }
         c.restore();
       }
+      // vectors: the arrow grows to its endpoint, so the direction reads before the label does
+      L.vecs.forEach(v => {
+        const q = v.q, d = v.d, vp = MO.smooth(ctx.p(t, q.at, q.dur || 1.0)); if (vp <= 0) return;
+        const x1 = P.X(v.from[0]), y1 = P.Y(v.from[1]), x2 = P.X(v.to[0]), y2 = P.Y(v.to[1]);
+        const ex = lerp(x1, x2, vp), ey = lerp(y1, y2, vp), ang = Math.atan2(y2 - y1, x2 - x1), head = 18 * u;
+        const clr = col(d.color) || M.BLUE_C;
+        c.save(); c.strokeStyle = clr; c.fillStyle = clr; c.lineWidth = (d.lw || 5) * u; c.lineCap = 'round'; c.lineJoin = 'round';
+        c.beginPath(); c.moveTo(x1, y1); c.lineTo(ex, ey); c.stroke();
+        if (vp >= 1) { c.beginPath(); c.moveTo(ex, ey); c.lineTo(ex - head * Math.cos(ang - 0.42), ey - head * Math.sin(ang - 0.42)); c.lineTo(ex - head * Math.cos(ang + 0.42), ey - head * Math.sin(ang + 0.42)); c.closePath(); c.fill(); }
+        c.restore();
+        if (d.label) { c.save(); c.globalAlpha *= vp; c.font = `${32 * u}px "${DG.FONT.it}"`; c.fillStyle = clr; c.textAlign = 'center'; c.fillText(d.label, (x1 + ex) / 2, (y1 + ey) / 2 - 18 * u); c.restore(); }
+      });
+      // matrices: brackets are drawn by hand so the entries stay in CMU like the rest of the formula
+      L.matBoxes = [];
+      L.mats.forEach(q => {
+        const d = q.data || {}, rows = d.rows || [], mp = MO.smooth(ctx.p(t, q.at, q.dur || 1.2)); if (mp <= 0 || !rows.length) return;
+        const cell = (d.size || 46) * u, gapc = 10 * u, cols = Math.max(...rows.map(r => r.length));
+        const w = cols * cell + (cols - 1) * gapc, h = rows.length * cell + (rows.length - 1) * gapc;
+        const cx = P ? P.x + P.w / 2 : W / 2, cy = P ? P.y + P.h / 2 : (L.text.y0 + L.text.y1) / 2;
+        const x0 = cx - w / 2, y0 = cy - h / 2, clr = col(d.color) || INK;
+        c.save(); c.strokeStyle = clr; c.lineWidth = 3 * u; c.lineCap = 'round'; const bw = 12 * u;
+        c.beginPath(); c.moveTo(x0 - bw, y0); c.lineTo(x0 - 4 * u, y0); c.lineTo(x0 - 4 * u, y0 + h); c.lineTo(x0 - bw, y0 + h);
+        c.moveTo(x0 + w + bw, y0); c.lineTo(x0 + w + 4 * u, y0); c.lineTo(x0 + w + 4 * u, y0 + h); c.lineTo(x0 + w + bw, y0 + h); c.stroke(); c.restore();
+        rows.forEach((row, ri) => row.forEach((val, ci) => {
+          const xx = x0 + ci * (cell + gapc) + cell / 2, yy = y0 + ri * (cell + gapc) + cell * 0.72;
+          const tk = val && typeof val === 'object' ? val : toks(String(val));
+          c.save(); c.globalAlpha *= mp; writeT(c, tk, xx, yy, cell * 0.8, 1, { col: clr }); c.restore();
+        }));
+        if (d.label) { c.save(); c.globalAlpha *= mp; c.font = `${30 * u}px "${DG.FONT.it}"`; c.fillStyle = clr; c.textAlign = 'center'; c.fillText(d.label, cx, y0 - 22 * u); c.restore(); }
+        L.matBoxes.push({ x: x0, y: y0, w, h });
+      });
+      // brace: DG.brace is vertical and opens to the right, so the label sits beside the middle notch
+      L.braces.forEach(q => {
+        const d = q.data || {}, bp = MO.smooth(ctx.p(t, q.at, q.dur || 0.8)); if (bp <= 0) return;
+        let target = null;
+        if (Array.isArray(d.rect) && d.rect.length === 4) target = { x: d.rect[0] * W, y: d.rect[1] * H, w: d.rect[2] * W, h: d.rect[3] * H };
+        else if (d.target === 'equation' && eqBox) target = eqBox;
+        else if (d.target === 'matrix' && L.matBoxes[d.index || 0]) target = L.matBoxes[d.index || 0];
+        if (!target) return;
+        const clr = col(d.color) || M.YELLOW;
+        DG.brace(c, target.x + target.w + 24 * u, target.y, target.y + target.h, { col: clr, lw: 3 * u, depth: 18 * u, p: bp });
+        if (d.label) { c.save(); c.globalAlpha *= bp; c.font = `${30 * u}px "${DG.FONT.it}"`; c.fillStyle = clr; c.textAlign = 'left'; c.fillText(d.label, target.x + target.w + 40 * u, target.y + target.h / 2 + 10 * u); c.restore(); }
+      });
+      // highlight on a plot object reuses the same Indicate curve as a bullet, tinted yellow and held afterwards
+      const hp = [...ctx.of('highlight')].reverse().find(z => z.data && (z.data.target === 'vector' || z.data.target === 'line') && t >= z.at - 1e-6);
+      if (hp) { const idx = hp.data.index || 0, ind = DG.indicate(ctx.p(t, hp.at, hp.dur || 0.8));
+        c.save(); c.globalAlpha *= Math.max(ind.k, 0.3); c.strokeStyle = M.YELLOW; c.lineWidth = 7 * u; c.lineCap = 'round';
+        if (hp.data.target === 'vector' && L.vecs[idx]) { const v = L.vecs[idx], mx = (P.X(v.from[0]) + P.X(v.to[0])) / 2, my = (P.Y(v.from[1]) + P.Y(v.to[1])) / 2;
+          c.beginPath(); c.moveTo(mx + (P.X(v.from[0]) - mx) * ind.s, my + (P.Y(v.from[1]) - my) * ind.s); c.lineTo(mx + (P.X(v.to[0]) - mx) * ind.s, my + (P.Y(v.to[1]) - my) * ind.s); c.stroke(); }
+        else if (hp.data.target === 'line' && L.lines[idx]) { c.beginPath(); L.lines[idx].rs.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); }
+        c.restore(); }
     }
     // ---- bullets ----
     const hl = ctx.of('highlight'), size = L.size;
